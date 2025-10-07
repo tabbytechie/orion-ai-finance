@@ -1,110 +1,248 @@
-# Orion Backend
+# Orion Backend API 💻
 
-“Orion Backend — Built with clarity, powered by intelligence.” 🌌
+> "Built with clarity, powered by intelligence." 🌌
 
-This repository contains the backend for the **Orion AI-Powered Financial Control Hub**. It is a modular, production-ready API built with Python, FastAPI, and PostgreSQL.
+![GitHub](https://img.shields.io/github/license/yourusername/orion-ai-finance)
+![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.95.2-009688?logo=fastapi&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-4169E1?logo=postgresql&logoColor=white)
+
+This repository contains the backend for the **Orion AI-Powered Financial Control Hub** - a high-performance, modular API built with Python, FastAPI, and PostgreSQL. The backend provides secure, scalable endpoints for financial data processing, user authentication, and AI-powered insights.
+
+## 💡 Key Features
+
+- 💰 **Financial Data Management**: Secure CRUD operations for transactions, accounts, and categories
+- 🔑 **JWT Authentication**: Secure user authentication with role-based access control
+- 📊 **Data Analytics**: Built-in financial analytics and reporting endpoints
+- 🤖 **AI Integration**: AI-powered insights and recommendations
+- 📦 **Modular Architecture**: Clean separation of concerns for maintainability
+- 🛠 **Production Ready**: Containerized with Docker, ready for deployment
+- 📝 **Comprehensive Documentation**: Interactive API docs with OpenAPI (Swagger UI)
 
 ## ⚙️ Tech Stack
 
-- **Language**: Python 3.11+
-- **Framework**: FastAPI
-- **Database**: PostgreSQL
-- **ORM**: SQLAlchemy with Alembic for migrations
-- **Authentication**: JWT (PyJWT) with role-based access
-- **Configuration**: Pydantic Settings
+| Component             | Technology                                                                 |
+|-----------------------|----------------------------------------------------------------------------|
+| **Language**          | Python 3.11+                                                              |
+| **Framework**         | [FastAPI](https://fastapi.tiangolo.com/)                                   |
+| **Database**          | PostgreSQL 13+                                                            |
+| **ORM**               | SQLAlchemy 2.0+ with async support                                        |
+| **Migrations**        | Alembic                                                                   |
+| **Authentication**    | JWT (PyJWT) with password hashing                                         |
+| **Validation**        | Pydantic v2                                                               |
+| **Containerization**  | Docker & Docker Compose                                                   |
 
-## 🧩 Architecture
+## 🧰 Project Structure
 
-The backend is designed as a **Modular Monolith**. Each business domain (e.g., `auth`, `transactions`) is encapsulated in its own module under `app/modules/`, promoting separation of concerns and maintainability.
+The backend follows a **Modular Monolith** architecture, where each business domain is encapsulated in its own module under `app/modules/`. This approach provides a good balance between maintainability and development speed.
 
 ```
 orion-backend/
-│
 ├── app/
-│   ├── core/         # Core components (config, db, security)
-│   ├── modules/      # Business logic modules
-│   ├── main.py       # FastAPI app entrypoint
-│   └── dependencies.py # Shared dependencies
-│
-├── alembic/          # Database migrations
-├── requirements.txt  # Python dependencies
-├── .env.example      # Environment variable template
-└── README.md         # This file
+│   ├── core/                 # Core application components
+│   │   ├── __init__.py
+│   │   ├── config.py           # Application configuration
+│   │   ├── database.py         # Database connection and session management
+│   │   └── security.py         # Authentication and security utilities
+│   ├── modules/              # Business logic modules
+│   │   ├── auth/               # Authentication module
+│   │   ├── transactions/       # Transaction management
+│   │   └── ai/                 # AI and analytics features
+│   ├── main.py               # FastAPI application factory
+│   └── dependencies.py       # Shared FastAPI dependencies
+├── alembic/              # Database migrations
+│   ├── versions/            # Migration scripts
+│   ├── env.py               # Migration environment
+│   └── script.py.mako       # Migration template
+├── tests/                # Test suite
+├── .env.example          # Environment variables template
+├── .gitignore
+├── alembic.ini           # Alembic configuration
+├── docker-compose.yml    # Local development setup
+├── Dockerfile            # Production Dockerfile
+├── pyproject.toml        # Project metadata and dependencies
+└── README.md             # This file
 ```
 
-## 🚀 Getting Started Locally
+### Module Structure
+
+Each module in `app/modules/` follows this structure:
+
+```
+module_name/
+├── __init__.py           # Module exports
+├── models.py            # SQLAlchemy models
+├── schemas.py           # Pydantic models for request/response
+├── routes.py            # API endpoints
+├── service.py           # Business logic
+└── tests/               # Module-specific tests
+```
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Python 3.11+ installed.
-- PostgreSQL running on your local machine.
-- A tool to create a database (e.g., `psql` or a GUI like DBeaver/PgAdmin).
+- Python 3.11 or higher
+- PostgreSQL 13+
+- Git
+- (Optional) Docker & Docker Compose
 
-### 1. Clone the Repository
+### Option 1: Local Development Setup
 
-Clone this project to your local machine and navigate into the `orion-backend` directory.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/orion-ai-finance.git
+   cd orion-ai-finance/orion-backend
+   ```
 
-### 2. Create and Activate a Virtual Environment
+2. **Set up a virtual environment**
+   ```bash
+   # For macOS/Linux
+   python3 -m venv venv
+   source venv/bin/activate
+   
+   # For Windows
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
 
-It is highly recommended to use a virtual environment to manage dependencies.
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```sh
-# For macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
+4. **Set up the database**
+   - Make sure PostgreSQL is running
+   - Create a new database:
+     ```sql
+     CREATE DATABASE orion;
+     CREATE USER orion_user WITH PASSWORD 'your_secure_password';
+     GRANT ALL PRIVILEGES ON DATABASE orion TO orion_user;
+     ```
 
-# For Windows
-python -m venv venv
-.\venv\Scripts\activate
+5. **Configure environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Update the `.env` file with your database credentials and generate a secure JWT secret:
+   ```bash
+   echo "JWT_SECRET_KEY=$(openssl rand -hex 32)" >> .env
+   ```
+
+6. **Run database migrations**
+   ```bash
+   alembic upgrade head
+   ```
+
+7. **Start the development server**
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+### Option 2: Docker Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/orion-ai-finance.git
+   cd orion-ai-finance/orion-backend
+   ```
+
+2. **Copy and configure environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env as needed
+   ```
+
+3. **Build and start services**
+   ```bash
+   docker-compose up -d --build
+   ```
+
+4. **Run migrations**
+   ```bash
+   docker-compose exec api alembic upgrade head
+   ```
+
+The API will be available at `http://localhost:8000`
+
+### 📝 API Documentation
+
+Once the server is running, explore the API documentation:
+
+- **Swagger UI (Interactive)**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **OpenAPI Schema**: http://localhost:8000/openapi.json
+
+## 📋 API Endpoints
+
+### Authentication
+- `POST /api/v1/auth/register` - Register a new user
+- `POST /api/v1/auth/login` - Authenticate and get JWT token
+- `POST /api/v1/auth/refresh` - Refresh access token
+- `GET /api/v1/auth/me` - Get current user details
+
+### Transactions
+- `GET /api/v1/transactions` - List all transactions
+- `POST /api/v1/transactions` - Create a new transaction
+- `GET /api/v1/transactions/{id}` - Get transaction details
+- `PUT /api/v1/transactions/{id}` - Update a transaction
+- `DELETE /api/v1/transactions/{id}` - Delete a transaction
+
+### Analytics
+- `GET /api/v1/analytics/overview` - Financial overview
+- `GET /api/v1/analytics/categories` - Spending by category
+- `GET /api/v1/analytics/trends` - Spending trends over time
+
+### AI Features
+- `GET /api/v1/ai/insights` - AI-powered financial insights
+- `POST /api/v1/ai/analyze` - Analyze financial data
+
+## 🛠 Development
+
+### Running Tests
+```bash
+# Run all tests
+pytest
+
+# Run tests with coverage report
+pytest --cov=app --cov-report=term-missing
 ```
 
-### 3. Install Dependencies
+### Code Style
+We use `black` for code formatting and `isort` for import sorting:
+```bash
+# Format code
+black .
 
-Install all required Python packages from `requirements.txt`.
-
-```sh
-pip install -r requirements.txt
+# Sort imports
+isort .
 ```
 
-### 4. Set Up the Database
-
-- Make sure your local PostgreSQL server is running.
-- Create a new database named `orion`.
-- Create a user `admin` with password `admin` and grant it permissions to the `orion` database.
-
-### 5. Set Up Environment Variables
-
-Create a `.env` file in the `orion-backend/` directory by copying the example file.
-
-```sh
-cp .env.example .env
+### Database Migrations
+When making changes to models, create a new migration:
+```bash
+alembic revision --autogenerate -m "description of changes"
+alembic upgrade head
 ```
 
-The `DATABASE_URL` should already be configured for `localhost`. Open the `.env` file and change the `JWT_SECRET_KEY` to a strong, unique secret. You can generate one using:
-```sh
-openssl rand -hex 32
-```
+## 👥 Contributing
 
-### 6. Run the Application
+Contributions are welcome! Please follow these steps:
 
-From the `orion-backend/` directory, run the application using Uvicorn:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-```sh
-uvicorn app.main:app --reload
-```
+## 📝 License
 
-The API will be available at `http://localhost:8000`.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### 7. Access the API Documentation
+## 👀 Show Your Support
 
-Once the application is running, you can access the interactive API documentation (powered by Swagger UI) at:
+Give a ⭐ if this project helped you!
 
-[http://localhost:8000/docs](http://localhost:8000/docs)
+---
 
-## 🧭 API Overview
-
-- `/api/v1/auth/register`: Create a new user.
-- `/api/v1/auth/login`: Authenticate and receive a JWT token.
-- `/api/v1/transactions/`: Create or retrieve transactions for the logged-in user.
-- `/api/v1/ai/insights`: (Placeholder) Get AI-driven insights.
-- `/api/v1/analytics/overview`: (Placeholder) Get financial analytics.
+Built with ❤️ by the Orion Team
