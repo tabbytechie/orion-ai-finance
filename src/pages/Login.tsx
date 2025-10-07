@@ -11,9 +11,13 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
+
   const [resetEmail, setResetEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -25,7 +29,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login(loginEmail, loginPassword);
       toast({
         title: "Welcome back!",
         description: "You've successfully logged in.",
@@ -45,7 +49,7 @@ export default function Login() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (password !== confirmPassword) {
+    if (signupPassword !== signupConfirmPassword) {
       toast({
         title: "Passwords don't match",
         description: "Please make sure both passwords are the same.",
@@ -58,8 +62,8 @@ export default function Login() {
 
     try {
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: signupEmail,
+        password: signupPassword,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
         },
@@ -73,9 +77,9 @@ export default function Login() {
       });
       
       // Clear form
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
+      setSignupEmail("");
+      setSignupPassword("");
+      setSignupConfirmPassword("");
     } catch (error: any) {
       toast({
         title: "Signup failed",
@@ -141,8 +145,8 @@ export default function Login() {
                     id="login-email"
                     type="email"
                     placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -151,8 +155,8 @@ export default function Login() {
                   <PasswordInput
                     id="login-password"
                     placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
                     required
                   />
                 </div>
@@ -170,8 +174,8 @@ export default function Login() {
                     id="signup-email"
                     type="email"
                     placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={signupEmail}
+                    onChange={(e) => setSignupEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -180,8 +184,8 @@ export default function Login() {
                   <PasswordInput
                     id="signup-password"
                     placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={signupPassword}
+                    onChange={(e) => setSignupPassword(e.target.value)}
                     required
                   />
                 </div>
@@ -190,8 +194,8 @@ export default function Login() {
                   <PasswordInput
                     id="confirm-password"
                     placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    value={signupConfirmPassword}
+                    onChange={(e) => setSignupConfirmPassword(e.target.value)}
                     required
                   />
                 </div>
