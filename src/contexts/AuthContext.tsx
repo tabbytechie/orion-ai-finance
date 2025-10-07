@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 type UserRole = "admin" | "user" | "accountant";
 
@@ -23,31 +25,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem("orion-user");
-    if (stored) {
-      setUser(JSON.parse(stored));
-    }
-    setIsLoading(false);
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        loadUserProfile(session.user);
+      }
+      setIsLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        loadUserProfile(session.user);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    // Mock authentication - replace with real API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    
-    const mockUser: User = {
-      id: "1",
-      email,
-      name: email.split("@")[0],
-      role: email.includes("admin") ? "admin" : "user",
-    };
-    
-    setUser(mockUser);
-    localStorage.setItem("orion-user", JSON.stringify(mockUser));
+  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", supabaseUser.id)
+      .single();
+
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", supabaseUser.id);
+
+    const userRole = roles?.[0]?.role || "user";
+
+    setUser({
+      id: supabaseUser.id,
+      email: supabaseUser.email || "",
+      name: profile?.full_name || supabaseUser.email?.split("@")[0] || "User",
+      role: userRole as UserRole,
+    });
   };
 
-  const logout = () => {
+  const login = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) throw error;
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem("orion-user");
   };
 
   return (
