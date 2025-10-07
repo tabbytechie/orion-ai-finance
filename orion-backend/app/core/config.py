@@ -1,13 +1,8 @@
-from pydantic import PostgresDsn, Field, field_validator
+from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
 class Settings(BaseSettings):
-    # Supabase Configuration
-    SUPABASE_URL: str = Field(..., env="VITE_SUPABASE_URL")
-    SUPABASE_KEY: str = Field(..., env="VITE_SUPABASE_PUBLISHABLE_KEY")
-    SUPABASE_DB_URL: str = Field(..., env="DATABASE_URL")
-    
     # JWT Configuration
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
@@ -20,16 +15,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:8000"]
     
     # Database Configuration
-    DATABASE_URL: str = ""
-    
-    @field_validator("DATABASE_URL")
-    @classmethod
-    def assemble_db_connection(cls, v: Optional[str], values) -> str:
-        if isinstance(v, str) and v:
-            return v
-        
-        # Fallback to Supabase DB URL if DATABASE_URL is not set
-        return values.data.get("SUPABASE_DB_URL", "")
+    DATABASE_URL: PostgresDsn
     
     model_config = SettingsConfigDict(
         env_file=".env",
