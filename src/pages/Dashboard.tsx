@@ -1,49 +1,40 @@
-import { DollarSign, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
-import { KPICard } from "@/components/dashboard/KPICard";
-import { SpendingChart } from "@/components/dashboard/SpendingChart";
-import { CategoryChart } from "@/components/dashboard/CategoryChart";
+import { DollarSign, TrendingUp, TrendingDown } from "lucide-react";
+import { SummaryCard } from "@/components/dashboard/SummaryCard";
+import { AccountSummary } from "@/components/dashboard/AccountSummary";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
+import { summaryData, recentTransactions } from "@/lib/mock-data";
 
 export default function Dashboard() {
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <KPICard
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SummaryCard
           title="Total Balance"
-          value="$45,231.89"
-          change="+20.1% from last month"
-          changeType="positive"
-          icon={<DollarSign className="w-6 h-6" />}
+          value={summaryData.totalBalance}
+          icon={<DollarSign className="w-6 h-6 text-muted-foreground" />}
         />
-        <KPICard
-          title="Income"
-          value="$12,234.00"
-          change="+12.5% from last month"
-          changeType="positive"
-          icon={<TrendingUp className="w-6 h-6" />}
+        <SummaryCard
+          title="Monthly Income"
+          value={summaryData.totalIncome}
+          icon={<TrendingUp className="w-6 h-6 text-muted-foreground" />}
+          className="text-green-500"
         />
-        <KPICard
-          title="Expenses"
-          value="$4,600.00"
-          change="-8.2% from last month"
-          changeType="positive"
-          icon={<TrendingDown className="w-6 h-6" />}
-        />
-        <KPICard
-          title="Anomalies"
-          value="2"
-          change="Requires attention"
-          changeType="negative"
-          icon={<AlertCircle className="w-6 h-6" />}
+        <SummaryCard
+          title="Monthly Expenses"
+          value={summaryData.totalExpenses}
+          icon={<TrendingDown className="w-6 h-6 text-muted-foreground" />}
+          className="text-red-500"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SpendingChart />
-        <CategoryChart />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1">
+          <AccountSummary accounts={summaryData.accounts} />
+        </div>
+        <div className="lg:col-span-2">
+          <RecentTransactions transactions={recentTransactions} />
+        </div>
       </div>
-
-      <RecentTransactions />
     </div>
   );
 }
