@@ -1,4 +1,5 @@
-import { Moon, Sun, Bell } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { TransactionDialog } from "@/components/transactions/TransactionDialog";
+import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
 
 export function Topbar() {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6 shadow-soft">
@@ -28,6 +32,8 @@ export function Topbar() {
       </div>
 
       <div className="flex items-center gap-3">
+        <TransactionDialog />
+
         <Button
           variant="ghost"
           size="icon"
@@ -41,10 +47,7 @@ export function Topbar() {
           )}
         </Button>
 
-        <Button variant="ghost" size="icon" className="rounded-full relative">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
-        </Button>
+        <NotificationsPanel />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -64,8 +67,12 @@ export function Topbar() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/profile")}>
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/settings")}>
+              Settings
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
