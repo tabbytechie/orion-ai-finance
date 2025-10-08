@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 # Configure SQLAlchemy engine with connection pooling and timeouts
 engine = create_engine(
-    settings.DATABASE_URL,
+    str(settings.DATABASE_URL),
     pool_pre_ping=True,  # Enable connection liveness checks
     pool_size=5,  # Number of connections to keep open
     max_overflow=10,  # Number of connections to create beyond pool_size

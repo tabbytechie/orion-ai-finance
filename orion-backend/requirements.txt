@@ -4,7 +4,13 @@ pydantic-settings
 sqlalchemy
 psycopg2-binary
 python-jose[cryptography]
-passlib[bcrypt]
+passlib==1.7.4
+# Pin bcrypt to a version compatible with passlib to avoid hashing errors.
+# See: https://github.com/pyca/bcrypt/issues/622
+bcrypt==3.2.2
 python-multipart
 alembic
 email-validator
+pytest
+pytest-cov
+httpx

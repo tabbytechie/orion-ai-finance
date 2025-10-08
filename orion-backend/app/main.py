@@ -22,10 +22,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     Handle application startup and shutdown events.
     """
     try:
-        # Initialize database tables
-        logger.info("Initializing database...")
-        init_db()
-        logger.info("Database initialized successfully")
+        # Initialize database tables only if not in testing mode
+        if not settings.TESTING:
+            logger.info("Initializing database...")
+            init_db()
+            logger.info("Database initialized successfully")
         
         yield
         
