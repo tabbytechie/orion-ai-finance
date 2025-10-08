@@ -1,3 +1,15 @@
+/**
+ * Login, Signup, and Password Reset Page
+ *
+ * This component provides a unified interface for user authentication. It uses
+ * tabs to switch between three forms:
+ * 1. Login: For existing users to sign in.
+ * 2. Sign Up: For new users to create an account.
+ * 3. Reset Password: For users who have forgotten their password.
+ *
+ * It handles form submission, communicates with the authentication provider (Supabase),
+ * and provides user feedback via toast notifications.
+ */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,34 +23,35 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function Login() {
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-
-  const [signupEmail, setSignupEmail] = useState("");
-  const [signupPassword, setSignupPassword] = useState("");
-  const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
-
+  // State for form inputs, consolidated for better readability
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [signupForm, setSignupForm] = useState({ email: "", password: "", confirmPassword: "" });
   const [resetEmail, setResetEmail] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleInputChange = (setter: Function, field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setter((prev: any) => ({ ...prev, [field]: e.target.value }));
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await login(loginEmail, loginPassword);
+      await login(loginForm.email, loginForm.password);
       toast({
         title: "Welcome back!",
-        description: "You've successfully logged in.",
+        description: "You have successfully logged in.",
       });
       navigate("/dashboard");
     } catch (error) {
       toast({
-        title: "Login failed",
-        description: "Invalid credentials. Please try again.",
+        title: "Login Failed",
+        description: "Invalid email or password. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -49,10 +62,10 @@ export default function Login() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (signupPassword !== signupConfirmPassword) {
+    if (signupForm.password !== signupForm.confirmPassword) {
       toast({
-        title: "Passwords don't match",
-        description: "Please make sure both passwords are the same.",
+        title: "Passwords Do Not Match",
+        description: "Please ensure both passwords are the same.",
         variant: "destructive",
       });
       return;
@@ -62,8 +75,8 @@ export default function Login() {
 
     try {
       const { error } = await supabase.auth.signUp({
-        email: signupEmail,
-        password: signupPassword,
+        email: signupForm.email,
+        password: signupForm.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
         },
@@ -72,18 +85,16 @@ export default function Login() {
       if (error) throw error;
 
       toast({
-        title: "Account created!",
-        description: "You can now sign in with your credentials.",
+        title: "Account Created Successfully!",
+        description: "Please check your email to verify your account before logging in.",
       });
       
-      // Clear form
-      setSignupEmail("");
-      setSignupPassword("");
-      setSignupConfirmPassword("");
+      // Clear form on success
+      setSignupForm({ email: "", password: "", confirmPassword: "" });
     } catch (error: any) {
       toast({
-        title: "Signup failed",
-        description: error.message || "Please try again.",
+        title: "Signup Failed",
+        description: error.message || "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -103,15 +114,15 @@ export default function Login() {
       if (error) throw error;
 
       toast({
-        title: "Reset email sent!",
-        description: "Check your email for the password reset link.",
+        title: "Password Reset Email Sent",
+        description: "Please check your inbox for a link to reset your password.",
       });
       
       setResetEmail("");
     } catch (error: any) {
       toast({
-        title: "Reset failed",
-        description: error.message || "Please try again.",
+        title: "Request Failed",
+        description: error.message || "Could not send reset email. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -127,26 +138,27 @@ export default function Login() {
             <span className="text-3xl font-bold text-primary-foreground">O</span>
           </div>
           <CardTitle className="text-2xl font-bold">Welcome to Orion</CardTitle>
-          <CardDescription>Your financial control hub</CardDescription>
+          <CardDescription>Your AI-powered financial control hub</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              <TabsTrigger value="reset">Reset</TabsTrigger>
+              <TabsTrigger value="reset">Password Reset</TabsTrigger>
             </TabsList>
 
+            {/* Login Form */}
             <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email">Email Address</Label>
                   <Input
                     id="login-email"
                     type="email"
-                    placeholder="your@email.com"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    value={loginForm.email}
+                    onChange={handleInputChange(setLoginForm, 'email')}
                     required
                   />
                 </div>
@@ -155,37 +167,38 @@ export default function Login() {
                   <PasswordInput
                     id="login-password"
                     placeholder="••••••••"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
+                    value={loginForm.password}
+                    onChange={handleInputChange(setLoginForm, 'password')}
                     required
                   />
                 </div>
                 <Button type="submit" className="w-full bg-gradient-primary" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign In"}
+                  {isLoading ? "Signing In..." : "Sign In"}
                 </Button>
               </form>
             </TabsContent>
 
+            {/* Signup Form */}
             <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4">
+              <form onSubmit={handleSignup} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">Email Address</Label>
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="your@email.com"
-                    value={signupEmail}
-                    onChange={(e) => setSignupEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    value={signupForm.email}
+                    onChange={handleInputChange(setSignupForm, 'email')}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">Create Password</Label>
                   <PasswordInput
                     id="signup-password"
-                    placeholder="••••••••"
-                    value={signupPassword}
-                    onChange={(e) => setSignupPassword(e.target.value)}
+                    placeholder="Minimum 8 characters"
+                    value={signupForm.password}
+                    onChange={handleInputChange(setSignupForm, 'password')}
                     required
                   />
                 </div>
@@ -193,33 +206,37 @@ export default function Login() {
                   <Label htmlFor="confirm-password">Confirm Password</Label>
                   <PasswordInput
                     id="confirm-password"
-                    placeholder="••••••••"
-                    value={signupConfirmPassword}
-                    onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                    placeholder="Re-enter your password"
+                    value={signupForm.confirmPassword}
+                    onChange={handleInputChange(setSignupForm, 'confirmPassword')}
                     required
                   />
                 </div>
                 <Button type="submit" className="w-full bg-gradient-primary" disabled={isLoading}>
-                  {isLoading ? "Creating account..." : "Sign Up"}
+                  {isLoading ? "Creating Account..." : "Create My Account"}
                 </Button>
               </form>
             </TabsContent>
 
+            {/* Password Reset Form */}
             <TabsContent value="reset">
-              <form onSubmit={handleResetPassword} className="space-y-4">
+              <form onSubmit={handleResetPassword} className="space-y-4 pt-4">
+                <p className="text-sm text-muted-foreground text-center">
+                  Enter your email to receive a password reset link.
+                </p>
                 <div className="space-y-2">
-                  <Label htmlFor="reset-email">Email</Label>
+                  <Label htmlFor="reset-email">Email Address</Label>
                   <Input
                     id="reset-email"
                     type="email"
-                    placeholder="your@email.com"
+                    placeholder="you@example.com"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
                     required
                   />
                 </div>
                 <Button type="submit" className="w-full bg-gradient-primary" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send Reset Link"}
+                  {isLoading ? "Sending Link..." : "Send Reset Link"}
                 </Button>
               </form>
             </TabsContent>

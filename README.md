@@ -5,17 +5,16 @@
 ![GitHub forks](https://img.shields.io/github/forks/yourusername/orion-ai-finance?style=social)
 ![GitHub issues](https://img.shields.io/github/issues/yourusername/orion-ai-finance)
 
-> **Orion AI Finance** is a modern financial control hub that leverages AI to help you manage your finances, gain insights, and make data-driven decisions. Built with a modern tech stack for performance and scalability.
+> **Orion AI Finance** is a modern financial control hub that leverages AI to help you manage your finances, gain insights, and make data-driven decisions. Built with a modern tech stack for performance, scalability, and clarity.
 
 ## ✨ Features
 
-- 📊 **Interactive Dashboards**: Beautiful visualizations of your financial data
-- 🤖 **AI-Powered Insights**: Get smart recommendations and predictions
-- 💳 **Transaction Management**: Track income and expenses with ease
-- 🔒 **Secure Authentication**: JWT-based authentication with role-based access
-- 📱 **Responsive Design**: Works seamlessly on all devices
-- 📈 **Financial Analytics**: Comprehensive reporting and trend analysis
-- 🚀 **Blazing Fast**: Built with Vite and React for optimal performance
+- 📊 **Interactive Dashboards**: Beautiful and responsive visualizations of your financial data.
+- 💳 **Full CRUD Transaction Management**: Create, read, update, and delete income and expense records with ease.
+- 🔒 **Secure JWT Authentication**: Robust, token-based authentication with secure endpoints for user management.
+- 📈 **Financial Analytics**: Access summaries of your financial health, including spending by category.
+- 🤖 **AI-Powered Insights**: (In Development) Get smart recommendations and spending forecasts.
+- 📱 **Responsive Design**: Works seamlessly on all devices, from mobile to desktop.
 
 ## 🛠 Tech Stack
 
@@ -25,83 +24,103 @@
 - **UI Components**: Shadcn UI + Radix UI
 - **Styling**: Tailwind CSS
 - **State Management**: React Query
-- **Form Handling**: React Hook Form
+- **Routing**: React Router
 
 ### Backend
 - **Framework**: FastAPI (Python)
 - **Database**: PostgreSQL
 - **ORM**: SQLAlchemy 2.0
-- **Authentication**: JWT
+- **Authentication**: JWT & Passlib
+- **Validation**: Pydantic
 - **Containerization**: Docker
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn
+- Node.js 18+
 - Python 3.11+
 - PostgreSQL 13+
 - Git
 
-### Installation
+### 1. Clone the Repository
+```bash
+git clone https://github.com/yourusername/orion-ai-finance.git
+cd orion-ai-finance
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/orion-ai-finance.git
-   cd orion-ai-finance
-   ```
+### 2. Set Up the Backend
+```bash
+cd orion-backend
 
-2. **Set up the backend**
-   ```bash
-   cd orion-backend
-   cp .env.example .env
-   # Update .env with your configuration
-   python -m venv venv
-   source venv/bin/activate  # On Windows: .\venv\Scripts\activate
-   pip install -r requirements.txt
-   alembic upgrade head
-   ```
+# Create the environment file from the example
+cp .env.example .env
+```
+Now, open the `.env` file and add your configuration. It requires two main variables:
+- `DATABASE_URL`: The connection string for your PostgreSQL database.
+  - e.g., `DATABASE_URL=postgresql+psycopg2://user:password@localhost/orion`
+- `JWT_SECRET_KEY`: A secret key for signing authentication tokens. Generate one with:
+  ```bash
+  openssl rand -hex 32
+  ```
 
-3. **Set up the frontend**
-   ```bash
-   cd ../  # Back to project root
-   npm install
-   cp .env.example .env
-   # Update .env with your backend URL
-   ```
+After configuring your `.env` file, proceed with the setup:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+pip install -r requirements.txt
+alembic upgrade head
+```
 
-4. **Start the development servers**
-   ```bash
-   # In one terminal (backend)
-   cd orion-backend
-   uvicorn app.main:app --reload
+### 3. Set Up the Frontend
+```bash
+cd ../  # Back to the project root
 
-   # In another terminal (frontend)
-   npm run dev
-   ```
+# Create the environment file. You may need to create a .env file
+# at the root and add your Supabase credentials if you are using them
+# for the frontend directly.
+npm install
+```
 
-5. **Open your browser** and navigate to `http://localhost:5173`
+### 4. Start the Development Servers
+```bash
+# In one terminal (from orion-backend/)
+uvicorn app.main:app --reload
+
+# In another terminal (from the project root)
+npm run dev
+```
+Navigate to `http://localhost:5173` to see the application.
 
 ## 🌐 Project Structure
 
 ```
 orion-ai-finance/
-├── orion-backend/     # FastAPI backend (see backend README)
-├── src/               # React frontend
-│   ├── components/    # Reusable UI components
-│   ├── pages/         # Page components
-│   ├── hooks/         # Custom React hooks
-│   ├── lib/           # Utility functions
-│   └── App.tsx        # Main application component
-├── public/            # Static assets
-└── .github/           # GitHub workflows and templates
+├── orion-backend/      # FastAPI backend
+│   ├── app/
+│   │   ├── core/         # Core components (config, db, security)
+│   │   ├── modules/      # Business logic (auth, transactions)
+│   │   ├── main.py       # FastAPI app entry point
+│   │   └── dependencies.py # Shared dependencies (e.g., get_current_user)
+│   ├── alembic/        # Database migrations
+│   └── tests/
+├── src/                # React frontend
+│   ├── components/
+│   │   ├── layout/       # Layout components (Navbar, Sidebar, etc.)
+│   │   └── ui/           # Reusable UI elements (Button, Card, etc.)
+│   ├── contexts/       # Global state (Auth, Theme)
+│   ├── pages/          # Page components
+│   ├── hooks/
+│   └── lib/
+└── .github/            # GitHub Actions and templates
 ```
 
-## 📚 Documentation
+## 📚 Documentation & Writing Style
 
-- [API Documentation](http://localhost:8000/docs) (requires backend to be running)
-- [Frontend Architecture](./docs/frontend-architecture.md)
-- [Deployment Guide](./docs/deployment.md)
+This project is committed to high-quality, clear, and consistent documentation, following the principles of the **Writing Test Framework**. This includes:
+- **Code Comments & Docstrings**: Explaining the "why," not the "how."
+- **API Documentation**: Auto-generated from detailed Pydantic schemas and FastAPI route definitions. Access it at `http://localhost:8000/docs` when the backend is running.
+- **Commit Messages**: Following the Conventional Commits standard.
 
 ## 🧪 Testing
 
@@ -109,48 +128,22 @@ orion-ai-finance/
 # Run frontend tests
 npm test
 
-# Run backend tests
-cd orion-backend
+# Run backend tests (from orion-backend/)
 pytest
 ```
 
 ## 🐳 Docker Setup
+For a containerized setup:
+```bash
+# Build and start services
+docker-compose up -d --build
 
-1. **Build and start containers**
-   ```bash
-   docker-compose up -d --build
-   ```
-
-2. **Run database migrations**
-   ```bash
-   docker-compose exec api alembic upgrade head
-   ```
-
-The application will be available at:
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
+# Run database migrations
+docker-compose exec api alembic upgrade head
+```
 
 ## 🤝 Contributing
-
-We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a pull request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Contributions are welcome! Please read our (to-be-created) `CONTRIBUTING.md` guidelines.
 
 ## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👏 Acknowledgments
-
-- [Shadcn UI](https://ui.shadcn.com/) for the beautiful component library
-- [Vite](https://vitejs.dev/) for the amazing development experience
-- [FastAPI](https://fastapi.tiangolo.com/) for the high-performance backend
-
----
-
-Built with ❤️ by the Orion Team
+This project is licensed under the MIT License. See the `LICENSE` file for details.

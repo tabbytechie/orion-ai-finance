@@ -7,242 +7,135 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.95.2-009688?logo=fastapi&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-4169E1?logo=postgresql&logoColor=white)
 
-This repository contains the backend for the **Orion AI-Powered Financial Control Hub** - a high-performance, modular API built with Python, FastAPI, and PostgreSQL. The backend provides secure, scalable endpoints for financial data processing, user authentication, and AI-powered insights.
+This repository contains the backend for the **Orion AI-Powered Financial Control Hub**. It's a high-performance, modular API built with Python, FastAPI, and PostgreSQL, designed for secure and scalable financial data management.
 
 ## 💡 Key Features
 
-- 💰 **Financial Data Management**: Secure CRUD operations for transactions, accounts, and categories
-- 🔑 **JWT Authentication**: Secure user authentication with role-based access control
-- 📊 **Data Analytics**: Built-in financial analytics and reporting endpoints
-- 🤖 **AI Integration**: AI-powered insights and recommendations
-- 📦 **Modular Architecture**: Clean separation of concerns for maintainability
-- 🛠 **Production Ready**: Containerized with Docker, ready for deployment
-- 📝 **Comprehensive Documentation**: Interactive API docs with OpenAPI (Swagger UI)
+- 💰 **Full CRUD for Transactions**: Securely create, read, update, and delete financial transactions.
+- 🔑 **Robust JWT Authentication**: Secure user registration and login with role-based access control and password hashing.
+- 📊 **Placeholder Analytics Endpoints**: Defined API contracts for future financial overview and trend analysis.
+- 🤖 **Placeholder AI Integration**: Defined API contracts for future AI-powered insights.
+- 📦 **Modular Architecture**: Clean separation of concerns with modules for each business domain.
+- 📝 **Comprehensive API Documentation**: Auto-generated, interactive API docs via Swagger UI and ReDoc.
 
 ## ⚙️ Tech Stack
 
-| Component             | Technology                                                                 |
-|-----------------------|----------------------------------------------------------------------------|
-| **Language**          | Python 3.11+                                                              |
-| **Framework**         | [FastAPI](https://fastapi.tiangolo.com/)                                   |
-| **Database**          | PostgreSQL 13+                                                            |
-| **ORM**               | SQLAlchemy 2.0+ with async support                                        |
-| **Migrations**        | Alembic                                                                   |
-| **Authentication**    | JWT (PyJWT) with password hashing                                         |
-| **Validation**        | Pydantic v2                                                               |
-| **Containerization**  | Docker & Docker Compose                                                   |
+| Component          | Technology                                     |
+|--------------------|------------------------------------------------|
+| **Language**       | Python 3.11+                                   |
+| **Framework**      | [FastAPI](https://fastapi.tiangolo.com/)       |
+| **Database**       | PostgreSQL 13+                                 |
+| **ORM**            | SQLAlchemy 2.0 (Synchronous)                   |
+| **Migrations**     | Alembic                                        |
+| **Authentication** | JWT (PyJWT) & Passlib (for hashing)            |
+| **Validation**     | Pydantic v2                                    |
+| **Containerization**| Docker & Docker Compose                       |
 
 ## 🧰 Project Structure
 
-The backend follows a **Modular Monolith** architecture, where each business domain is encapsulated in its own module under `app/modules/`. This approach provides a good balance between maintainability and development speed.
+The backend follows a modular monolith architecture, with each business domain encapsulated in `app/modules/`.
 
 ```
 orion-backend/
 ├── app/
-│   ├── core/                 # Core application components
-│   │   ├── __init__.py
-│   │   ├── config.py           # Application configuration
-│   │   ├── database.py         # Database connection and session management
-│   │   └── security.py         # Authentication and security utilities
-│   ├── modules/              # Business logic modules
-│   │   ├── auth/               # Authentication module
-│   │   ├── transactions/       # Transaction management
-│   │   └── ai/                 # AI and analytics features
-│   ├── main.py               # FastAPI application factory
-│   └── dependencies.py       # Shared FastAPI dependencies
-├── alembic/              # Database migrations
-│   ├── versions/            # Migration scripts
-│   ├── env.py               # Migration environment
-│   └── script.py.mako       # Migration template
-├── tests/                # Test suite
-├── .env.example          # Environment variables template
-├── .gitignore
-├── alembic.ini           # Alembic configuration
-├── docker-compose.yml    # Local development setup
-├── Dockerfile            # Production Dockerfile
-├── pyproject.toml        # Project metadata and dependencies
-└── README.md             # This file
-```
-
-### Module Structure
-
-Each module in `app/modules/` follows this structure:
-
-```
-module_name/
-├── __init__.py           # Module exports
-├── models.py            # SQLAlchemy models
-├── schemas.py           # Pydantic models for request/response
-├── routes.py            # API endpoints
-├── service.py           # Business logic
-└── tests/               # Module-specific tests
+│   ├── core/           # Core components (config, database, security)
+│   ├── modules/        # Business logic modules (auth, transactions)
+│   ├── main.py         # FastAPI application entry point
+│   └── dependencies.py   # Shared dependencies (e.g., get_current_user)
+├── alembic/            # Database migrations
+├── tests/              # Test suite
+├── .env.example
+├── alembic.ini
+├── Dockerfile
+└── README.md
 ```
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### 1. Set Up Virtual Environment
+From the `orion-backend` directory:
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-- Python 3.11 or higher
-- PostgreSQL 13+
-- Git
-- (Optional) Docker & Docker Compose
+### 2. Configure Environment Variables
+```bash
+cp .env.example .env
+```
+Open the newly created `.env` file and set the following variables:
+- `DATABASE_URL`: Your full PostgreSQL connection string.
+  - *Example: `DATABASE_URL=postgresql+psycopg2://orion_user:your_password@localhost/orion`*
+- `JWT_SECRET_KEY`: A 32-byte hex-encoded secret key. You can generate one with:
+  - `openssl rand -hex 32`
 
-### Option 1: Local Development Setup
+### 3. Set Up Database
+Ensure your PostgreSQL server is running, then create the database and user:
+```sql
+CREATE DATABASE orion;
+CREATE USER orion_user WITH PASSWORD 'your_secure_password';
+GRANT ALL PRIVILEGES ON DATABASE orion TO orion_user;
+```
+Run the database migrations:
+```bash
+alembic upgrade head
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/orion-ai-finance.git
-   cd orion-ai-finance/orion-backend
-   ```
+### 4. Start the Server
+```bash
+uvicorn app.main:app --reload
+```
+The API will be available at `http://localhost:8000`.
 
-2. **Set up a virtual environment**
-   ```bash
-   # For macOS/Linux
-   python3 -m venv venv
-   source venv/bin/activate
-   
-   # For Windows
-   python -m venv venv
-   .\venv\Scripts\activate
-   ```
+## 📝 API Documentation
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Set up the database**
-   - Make sure PostgreSQL is running
-   - Create a new database:
-     ```sql
-     CREATE DATABASE orion;
-     CREATE USER orion_user WITH PASSWORD 'your_secure_password';
-     GRANT ALL PRIVILEGES ON DATABASE orion TO orion_user;
-     ```
-
-5. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   ```
-   Update the `.env` file with your database credentials and generate a secure JWT secret:
-   ```bash
-   echo "JWT_SECRET_KEY=$(openssl rand -hex 32)" >> .env
-   ```
-
-6. **Run database migrations**
-   ```bash
-   alembic upgrade head
-   ```
-
-7. **Start the development server**
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-
-### Option 2: Docker Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/orion-ai-finance.git
-   cd orion-ai-finance/orion-backend
-   ```
-
-2. **Copy and configure environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env as needed
-   ```
-
-3. **Build and start services**
-   ```bash
-   docker-compose up -d --build
-   ```
-
-4. **Run migrations**
-   ```bash
-   docker-compose exec api alembic upgrade head
-   ```
-
-The API will be available at `http://localhost:8000`
-
-### 📝 API Documentation
-
-Once the server is running, explore the API documentation:
-
-- **Swagger UI (Interactive)**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-- **OpenAPI Schema**: http://localhost:8000/openapi.json
+Once the server is running, explore the interactive API documentation:
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
 
 ## 📋 API Endpoints
 
+All endpoints are prefixed with `/api/v1`.
+
 ### Authentication
-- `POST /api/v1/auth/register` - Register a new user
-- `POST /api/v1/auth/login` - Authenticate and get JWT token
-- `POST /api/v1/auth/refresh` - Refresh access token
-- `GET /api/v1/auth/me` - Get current user details
+- `POST /auth/register`: Register a new user.
+- `POST /auth/login`: Authenticate and receive a JWT.
+- `GET /auth/me`: Get the currently authenticated user's details.
 
 ### Transactions
-- `GET /api/v1/transactions` - List all transactions
-- `POST /api/v1/transactions` - Create a new transaction
-- `GET /api/v1/transactions/{id}` - Get transaction details
-- `PUT /api/v1/transactions/{id}` - Update a transaction
-- `DELETE /api/v1/transactions/{id}` - Delete a transaction
+- `POST /transactions`: Create a new transaction.
+- `GET /transactions`: List all transactions for the current user.
+- `GET /transactions/{id}`: Get a single transaction by ID.
+- `PUT /transactions/{id}`: Update a transaction.
+- `DELETE /transactions/{id}`: Delete a transaction.
 
-### Analytics
-- `GET /api/v1/analytics/overview` - Financial overview
-- `GET /api/v1/analytics/categories` - Spending by category
-- `GET /api/v1/analytics/trends` - Spending trends over time
+### Analytics (Placeholders)
+- `GET /analytics/overview`: Get a financial overview (income, expenses, etc.).
+- `GET /analytics/forecast`: Get a forecast of future spending.
+- `GET /analytics/trends`: Get data for spending trends over time.
 
-### AI Features
-- `GET /api/v1/ai/insights` - AI-powered financial insights
-- `POST /api/v1/ai/analyze` - Analyze financial data
+### AI (Placeholders)
+- `GET /ai/insights`: Get AI-powered insights on financial habits.
 
 ## 🛠 Development
 
-### Running Tests
-```bash
-# Run all tests
-pytest
-
-# Run tests with coverage report
-pytest --cov=app --cov-report=term-missing
-```
-
 ### Code Style
-We use `black` for code formatting and `isort` for import sorting:
+We use `black` for formatting and `isort` for import sorting.
 ```bash
-# Format code
 black .
-
-# Sort imports
 isort .
 ```
 
 ### Database Migrations
-When making changes to models, create a new migration:
+When you change a model in `app/modules/*/models.py`:
 ```bash
-alembic revision --autogenerate -m "description of changes"
+alembic revision --autogenerate -m "Your migration message"
 alembic upgrade head
 ```
 
 ## 👥 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👀 Show Your Support
-
-Give a ⭐ if this project helped you!
+Contributions are welcome! Please fork the repository and open a pull request.
 
 ---
-
 Built with ❤️ by the Orion Team
